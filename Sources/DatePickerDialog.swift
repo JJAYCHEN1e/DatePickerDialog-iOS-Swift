@@ -115,11 +115,23 @@ open class DatePickerDialog: UIView {
         if #available(iOS 13.4, *) { datePicker.preferredDatePickerStyle = .wheels }
 
         /* Add dialog to main window */
-        guard let appDelegate = UIApplication.shared.delegate else { fatalError() }
-        guard let window = appDelegate.window else { fatalError() }
-        window?.addSubview(self)
-        window?.bringSubviewToFront(self)
-        window?.endEditing(true)
+        if #available(iOS 13.0, *) {
+            for scene in UIApplication.shared.connectedScenes {
+                if scene.activationState == .foregroundActive {
+                    guard let window = ((scene as? UIWindowScene)!.delegate as! UIWindowSceneDelegate).window else { fatalError() }
+                    window?.addSubview(self)
+                    window?.bringSubviewToFront(self)
+                    window?.endEditing(true)
+                    break
+                }
+            }
+        } else {
+            guard let appDelegate = UIApplication.shared.delegate else { fatalError() }
+            guard let window = appDelegate.window else { fatalError() }
+            window?.addSubview(self)
+            window?.bringSubviewToFront(self)
+            window?.endEditing(true)
+        }
 
         NotificationCenter.default.addObserver(
             self,
